@@ -17,7 +17,7 @@ icacls %windir%\System32\Oobe\useroobe.dll /inheritance:r
 
 :: Execute Powershell (.ps1) files alphabetically (non-blocking)
 for /f "tokens=*" %%A in ('dir /b /o:n *.ps1') do (
-    Start "" powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File "%%A"
+    powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File "%%A"
 )
 
 :: Execute Registry (.reg) files alphabetically
