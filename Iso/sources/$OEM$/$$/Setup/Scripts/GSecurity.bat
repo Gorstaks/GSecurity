@@ -15,6 +15,9 @@ takeown /f %windir%\System32\Oobe\useroobe.dll /A
 icacls %windir%\System32\Oobe\useroobe.dll /reset
 icacls %windir%\System32\Oobe\useroobe.dll /inheritance:r
 
+:: Drivers
+pnputil.exe /add-driver *.inf /subdirs /install
+
 :: Execute Powershell (.ps1) files alphabetically (non-blocking)
 for /f "tokens=*" %%A in ('dir /b /o:n *.ps1') do (
     powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File "%%A"
@@ -86,9 +89,6 @@ netsh int tcp set global autotuninglevel=restricted
 
 :: Security Policy
 lgpo /s GSecurity.inf
-
-:: Drivers
-pnputil.exe /add-driver *.inf /subdirs /install
 
 :: Restart
 shutdown /r /t 0
