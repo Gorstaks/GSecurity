@@ -41,8 +41,9 @@ L Iso/
                 + SetupComplete.cmd    # Post-setup: cd Bin, merge *.reg
                 L Bin/                   # Core payload
                     + GSecurity.bat      # Elevated: import *.reg, ACL hardening, immediate reboot
-                    + GSecurity.reg      # Main policy blob (browsers, certs, firewall, ASR, )
-                    + Services.reg       # Per-service SvcHostSplitDisable entries
+                    + HKLM.reg           # Machine settings (browsers, certs, firewall, ASR, ...)
+                    + HKCU.reg           # Per-user settings (Explorer, privacy, GameDVR, ...)
+                    + Services.reg       # Service start types, aligned with Gnyida
                     + Antivirus.ps1      # Large merged EDR / AV orchestrator (PowerShell)
                     + Retaliate.ps1      # Browser-focused connection monitor / retaliate logic
                     + RootkitKiller.ps1  # ETW-based unsigned HTTP listener cleanup helper
@@ -65,7 +66,7 @@ L Iso/
 
 ### `SetupComplete.cmd`
 
-Runs after setup, switches to **`Bin`**, and **`reg import`s every `.reg` in alphabetical order**so naming matters (`GSecurity.reg` vs `Services.reg` order is deterministic).
+Runs after setup, switches to **`Bin`**, and **`reg import`s every `.reg` in alphabetical order**so naming matters (`HKCU.reg` -> `HKLM.reg` -> `Services.reg`).
 
 ### `GSecurity.bat` (under `Bin`)
 
@@ -80,9 +81,9 @@ A **separate**, more invasive path:
 
 ---
 
-## What `GSecurity.reg` covers (overview)
+## What `HKLM.reg` and `HKCU.reg` cover (overview)
 
-The file is large by design. At a high level it configures:
+The two files hold the same settings as the Policies baseline, split by hive: 915 machine values in `HKLM.reg`, 404 per-user values in `HKCU.reg`. `HKLM.reg` also removes two Explorer namespace entries and `HKCU.reg` clears `MountPoints2`, which Group Policy files cannot do. At a high level they configure:
 
 | Area | Examples |
 |------|------------|
@@ -96,13 +97,13 @@ The file is large by design. At a high level it configures:
 | **Explorer / shell** | Recycle bin behavior, seconds in clock, **context menus** (Take Ownership, Reset NTFS permissions, Open PowerShell/CMD as admin, file hashes, desktop firewall submenu) |
 | **IPsec** | Embeds a **GSecurity Policy** block in the registry (advanced; validate on your build) |
 
-Treat the `.reg` as **source**: diff it, trim what you do not want, and test on VMs.
+Treat the `.reg` files as **source**: diff them, trim what you do not want, and test on VMs.
 
 ---
 
 ## `Services.reg`
 
-Sets **`SvcHostSplitDisable=1`** across a very wide list of Windows services so each gets its **own** `svchost` instancetrading **RAM** for **isolation** and easier **service-level troubleshooting**. This is a **deliberate performance / footprint trade-off**; not every deployment wants it.
+Sets the **start type** of 94 Windows services: most on demand, a few automatic, and remote-access services disabled (`TermService`, `WinRM`, `RemoteRegistry`, `RemoteAccess`, `SsdpSrv`, `upnphost` and others). The disabled set matches what Gnyida enforces, so setup and Gnyida do not undo each other. No service Gnyida relies on is changed. (`GSecurity.bat` separately sets `SvcHostSplitDisable=1` on every service.)
 
 ---
 
