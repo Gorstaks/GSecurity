@@ -51,7 +51,7 @@ Windows Registry Editor Version 5.00
 "LmCompatibilityLevel"=dword:00000005
 "DisableDomainCreds"=dword:00000001
 "TokenLeakDetectDelaySecs"=dword:0000001e
-"AuditBaseObjects"=dword:00000001
+"AuditBaseObjects"=dword:00000000
 "AuditPerUserAuditing"=dword:00000001
 
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\Audit]
@@ -78,7 +78,7 @@ Windows Registry Editor Version 5.00
 ; -----------------------------------------------------------------------------
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon]
-"CachedLogonsCount"="0"
+"CachedLogonsCount"="2"
 "IgnoreShiftOverride"="1"
 "IgnoreShiftOveride"=dword:00000001
 "AllowMultipleTSSessions"=dword:00000000
@@ -202,8 +202,8 @@ Windows Registry Editor Version 5.00
 ; -----------------------------------------------------------------------------
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System]
-"ConsentPromptBehaviorAdmin"=dword:00000002
-"ConsentPromptBehaviorEnhancedAdmin"=dword:00000001
+"ConsentPromptBehaviorAdmin"=dword:00000005
+"ConsentPromptBehaviorEnhancedAdmin"=dword:00000002
 "ConsentPromptBehaviorUser"=dword:00000003
 "DisableAutomaticRestartSignOn"=dword:00000001
 "EnableFirstLogonAnimation"=dword:00000000
@@ -247,19 +247,20 @@ Windows Registry Editor Version 5.00
 ; Script block logging - records all PS script content including deobfuscated
 [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging]
 "EnableScriptBlockLogging"=dword:00000001
-"EnableScriptBlockInvocationLogging"=dword:00000001
+"EnableScriptBlockInvocationLogging"=dword:00000000
 
 ; Module logging - logs all module activity
 [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging]
-"EnableModuleLogging"=dword:00000001
+"EnableModuleLogging"=dword:00000000
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging\ModuleNames]
-"*"="*"
+; "*"="*" removed: module logging is off (Gnyida runs PowerShell about every 22 s and "*" logged every cmdlet).
 
 ; Transcription logging
+; Transcription, module logging and invocation logging are off: they recorded every run of Gnyida's PowerShell firewall bridge (~3,700 a day). Script block logging (4104) stays on; Gnyida reads it.
 [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription]
-"EnableTranscripting"=dword:00000001
-"EnableInvocationHeader"=dword:00000001
+"EnableTranscripting"=dword:00000000
+"EnableInvocationHeader"=dword:00000000
 "OutputDirectory"="C:\\Windows\\System32\\LogFiles\\PowerShell"
 
 ; Constrained Language Mode - REMOVED (full language mode allowed)
@@ -1048,7 +1049,7 @@ Windows Registry Editor Version 5.00
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System]
 "dontdisplaylastusername"=dword:00000001
-"legalnoticetext"=""
+"legalnoticetext"=hex(7):00,00
 "VerboseStatus"=dword:00000001
 "NoDispCPL"=dword:00000000
 
@@ -1208,7 +1209,7 @@ Windows Registry Editor Version 5.00
 @="{64bc32b5-4eec-4de7-972d-bd8bd0324537}"
 
 [HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\LanmanServer\Parameters]
-"autodisconnect"=dword:ffffffff
+"autodisconnect"=dword:0000000f
 "EnableOplocks"=dword:00000000
 "IRPStackSize"=dword:00000020
 "SharingViolationDelay"=dword:00000000
